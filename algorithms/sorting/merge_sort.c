@@ -9,7 +9,7 @@ void print_array(int arr[], size_t length) {
 }
 
 void merge(int arr[], int l, int m, int r) {
-    int left_bucket_length = l;
+    int left_bucket_length = m - l + 1; 
     int right_bucket_length = r - m;
 
     int *left_bucket = (int *)malloc(left_bucket_length * sizeof(int));
@@ -18,18 +18,22 @@ void merge(int arr[], int l, int m, int r) {
     int i, j;
 
     for (i = 0; i < left_bucket_length; i++) {
-        left_bucket = arr[i + l];
+        left_bucket[i] = arr[l + i];
     }
+    // printf("left_bucket: ");
+    // print_array(left_bucket, left_bucket_length);
 
     for (j = 0; j < right_bucket_length; j++) {
-        right_bucket = arr[j + m];
+        right_bucket[j] = arr[m + j + 1];
     }
+    // printf("right_bucket: ");
+    // print_array(right_bucket, right_bucket_length);
 
     int k = l;
     i = 0, j = 0;
 
     while (i < left_bucket_length && j < right_bucket_length) {
-        if (left_bucket[i] > right_bucket[j]) {
+        if (left_bucket[i] < right_bucket[j]) {
             arr[k] = left_bucket[i];
             i++;
         } else {
@@ -50,6 +54,14 @@ void merge(int arr[], int l, int m, int r) {
         j++;
         k++;
     }
+    
+    // printf("array inside of merge: ");
+    // print_array(arr, k);
+
+    free(left_bucket);
+    left_bucket = NULL;
+    free(right_bucket);
+    right_bucket = NULL;
 }
 
 void merge_sort(int arr[], int left, int right) {
