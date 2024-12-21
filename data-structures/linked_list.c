@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 typedef struct Node {
-   int value;
-   struct Node *next; 
+    int value;
+    struct Node *next;
 } Node;
 
 Node *create_node(int val) {
@@ -18,6 +18,7 @@ Node *create_node(int val) {
     return new_node;
 }
 
+// push at the end of the list
 void push_node(Node **head, int val) {
     Node *new_node = create_node(val);
     if (*head == NULL) {
@@ -33,15 +34,18 @@ void push_node(Node **head, int val) {
     curr->next = new_node;
 }
 
+// adds at the beginning of the list
 void unshift_node(Node **head, int val) {
     Node *new_node = create_node(val);
     new_node->next = *head;
     *head = new_node;
 }
 
+// removes the first element of the list
 int shift_node(Node **head) {
     int rm_val = -1;
 
+    // if the list is empty return -1
     if (*head == NULL) {
         printf("shift: no list found\n");
         return rm_val;
@@ -127,8 +131,8 @@ int delete_by_index(Node **head, int index) {
         curr = curr->next;
     }
     
-    // if this is true it means that we did not find the value
-    // curr->next should have the value that we want to delete
+    // if it is NULL then we did not find the value
+    // curr->next->next is the value that we want to delete
     if (curr->next == NULL) {
         return rm_val;
     }
@@ -144,6 +148,7 @@ int delete_by_index(Node **head, int index) {
     return rm_val;
 }
 
+// reverse the linked list
 void reverse_ll(Node **head) {
     Node *prev = NULL,
         *curr = *head,
@@ -159,6 +164,7 @@ void reverse_ll(Node **head) {
     *head = prev;
 }
 
+// print the linked list
 void print_ll(Node *head) {
     for (Node *curr = head; curr != NULL; curr = curr->next) {
         printf("[%d]->", curr->value);
@@ -166,14 +172,14 @@ void print_ll(Node *head) {
     printf("NULL\n");
 }
 
-void free_nodes(Node **head) {
-    Node *curr = *head;
-    while (curr != NULL) {
-        Node *temp_node = curr;
-        curr = curr->next;
-        free(temp_node);
+// free the linked list
+void free_node(Node **head) {
+    if (*head == NULL) {
+        return;
     }
 
+    free_node(&(*head)->next);
+    free(*head);
     *head = NULL;
 }
 
@@ -184,8 +190,8 @@ int main(void) {
     push_node(&list, 26);
     unshift_node(&list, 28);
     unshift_node(&list, 30);
-    push_node(&list, 22);
-
+    push_node(&list, 32);
+    push_node(&list, 15);
     print_ll(list);
 
     printf("shifted: %d\n",shift_node(&list));
@@ -208,11 +214,11 @@ int main(void) {
         printf("value: %d deleted\n", deleted); 
     }
 
-    reverse_ll(&list);
+    // reverse_ll(&list);
     print_ll(list);
 
     if (list != NULL) {
-        free_nodes(&list);
+        free_node(&list);
     }
 
     return 0;
