@@ -8,19 +8,6 @@ typedef struct Node {
     struct Node *next;
 } Node;
 
-void free_buckets(Node **bucket) {
-    for (int i = 0; i < BUCKET_SIZE; i++) {
-        Node *curr = bucket[i];
-        while (curr != NULL) {
-            Node *temp = curr;
-            curr = curr->next; 
-            free(temp);
-        }
-
-        bucket[i] = NULL;
-    }
-}
-
 Node *create_node(int num) {
     Node *new_node = (Node *)malloc(sizeof(Node));
     if (new_node == NULL) {
@@ -53,28 +40,21 @@ void sorted_insert(Node **bucket, int num) {
 void bucket_sort(int arr[], size_t length) {
     Node *bucket[BUCKET_SIZE] = { NULL };
 
-    int max_value = arr[0];
-    for (int i = 1; i < length; i++) {
-        if (arr[i] > max_value) {
-            max_value = arr[i];
-        }
-    }
-
     for (int i = 0; i < length; i++) {
-        int index = (arr[i] * BUCKET_SIZE) / (max_value + 1);
+        int index = arr[i] / BUCKET_SIZE;
         sorted_insert(&bucket[index], arr[i]);
     }
 
-    int arr_index = 0;
+    int k = 0;
     for (int i = 0; i < BUCKET_SIZE; i++) {
         Node *curr = bucket[i];
         while (curr != NULL) {
-           arr[arr_index++] = curr->number; 
-           curr = curr->next;
+            arr[k++] = curr->number;
+            Node *next = curr->next;
+            free(curr);
+            curr = next;
         }
     }
-
-    free_buckets(bucket);
 }
 
 void print_array(int arr[], size_t length) {
@@ -85,8 +65,8 @@ void print_array(int arr[], size_t length) {
 }
 
 int main(void) {
-    // int array[] = { 6, 1, 2, 5, 4, 3, 7, 8 };
-    int array[] = { 26, 21, 25, 22, 28, 24, 27, 23 };
+    int array[] = { 6, 1, 2, 5, 4, 3, 7, 8 };
+    // int array[] = { 26, 21, 25, 22, 28, 24, 27, 23 };
     size_t length = sizeof(array) / sizeof(array[0]);
 
     printf("before sorting:\n");
