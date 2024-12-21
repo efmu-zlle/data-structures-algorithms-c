@@ -18,7 +18,7 @@ Node *create_node(int val) {
     return new_node;
 }
 
-void push(Node **head, int val) {
+void push_node(Node **head, int val) {
     Node *new_node = create_node(val);
     if (*head == NULL) {
         *head = new_node;
@@ -33,13 +33,13 @@ void push(Node **head, int val) {
     curr->next = new_node;
 }
 
-void unshift(Node **head, int val) {
+void unshift_node(Node **head, int val) {
     Node *new_node = create_node(val);
     new_node->next = *head;
     *head = new_node;
 }
 
-int shift(Node **head) {
+int shift_node(Node **head) {
     int rm_val = -1;
 
     if (*head == NULL) {
@@ -55,7 +55,7 @@ int shift(Node **head) {
     return rm_val;
 }
 
-int pop(Node *head) {
+int pop_node(Node *head) {
     int rm_val = -1;
 
     if (head == NULL) {
@@ -144,10 +144,22 @@ int delete_by_index(Node **head, int index) {
     return rm_val;
 }
 
-void reveser_linked_list(Node *head) {
+void reverse_ll(Node **head) {
+    Node *prev = NULL,
+        *curr = *head,
+        *next = NULL;
+    
+    while (curr != NULL) {
+        next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }
+
+    *head = prev;
 }
 
-void print_list(Node *head) {
+void print_ll(Node *head) {
     for (Node *curr = head; curr != NULL; curr = curr->next) {
         printf("[%d]->", curr->value);
     }
@@ -168,19 +180,19 @@ void free_nodes(Node **head) {
 int main(void) {
     Node *list = NULL; 
 
-    push(&list, 24);
-    push(&list, 26);
-    unshift(&list, 28);
-    unshift(&list, 30);
-    push(&list, 22);
+    push_node(&list, 24);
+    push_node(&list, 26);
+    unshift_node(&list, 28);
+    unshift_node(&list, 30);
+    push_node(&list, 22);
 
-    print_list(list);
+    print_ll(list);
 
-    printf("shifted: %d\n",shift(&list));
-    print_list(list);
+    printf("shifted: %d\n",shift_node(&list));
+    print_ll(list);
     
-    printf("popped: %d\n", pop(list));
-    print_list(list);
+    printf("popped: %d\n", pop_node(list));
+    print_ll(list);
 
     int deleted;
     if ((deleted = delete_by_value(&list, 24)) == -1) {
@@ -188,14 +200,16 @@ int main(void) {
     } else {
         printf("value: %d deleted\n", deleted); 
     }
-    print_list(list);
+    print_ll(list);
 
     if ((deleted = delete_by_index(&list, 5)) == -1) {
         printf("does not exist\n");
     } else {
         printf("value: %d deleted\n", deleted); 
     }
-    print_list(list);
+
+    reverse_ll(&list);
+    print_ll(list);
 
     if (list != NULL) {
         free_nodes(&list);
