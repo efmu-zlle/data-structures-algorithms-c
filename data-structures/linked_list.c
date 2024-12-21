@@ -88,7 +88,12 @@ int pop_node(Node *head) {
 
 int delete_by_value(Node **head, int val) {
     int rm_val = -1;
+    // if the list is empty return -1
+    if (*head == NULL) {
+        return rm_val;
+    }
 
+    // if the value is the first element of the list then remove it
     if ((*head)->value == val) {
         Node *next_node = (*head)->next;
         rm_val = (*head)->value;
@@ -97,24 +102,37 @@ int delete_by_value(Node **head, int val) {
         return rm_val;
     }
 
-    Node *prev = *head, *curr = (*head)->next;
-    while (curr != NULL) {
-        if (curr->value == val) {
-            rm_val = curr->value;
-            prev->next = curr->next;
-            free(curr); 
-            curr = NULL;
-            return rm_val;
-        }
-        prev = curr;
+    // if the value is not the first element of the list 
+    Node *curr = *head, *temp_node = NULL;
+    while (curr->next != NULL && curr->next->value != val) {
         curr = curr->next;
     }
+
+    // if it is NULL then we did not find the value
+    if (curr->next == NULL) {
+        return rm_val;
+    }
+
+    // curr->next->next is the value that we want to delete
+    temp_node = curr->next;
+    rm_val = temp_node->value;
+
+    curr->next = temp_node->next;
+
+    free(temp_node);
+    temp_node = NULL;
 
     return rm_val;
 }
 
 int delete_by_index(Node **head, int index) {
     int rm_val = -1;
+    // if the list is empty return -1
+    if (*head == NULL) {
+        return rm_val;
+    }
+
+    // if the index is 0 then remove the first element
     if (index == 0) {
         Node *next_node = (*head)->next;
         rm_val = (*head)->value;
@@ -123,20 +141,16 @@ int delete_by_index(Node **head, int index) {
         return rm_val;
     }
 
+    // if the index is not the first element of the list
     Node *curr = *head, *temp_node = NULL;
     for (int i = 0; i < index - 1; i++) {
-        if (curr == NULL) {
+        if (curr->next == NULL) {
             return rm_val;
         }
         curr = curr->next;
     }
-    
-    // if it is NULL then we did not find the value
-    // curr->next->next is the value that we want to delete
-    if (curr->next == NULL) {
-        return rm_val;
-    }
 
+    // curr->next is the value that we want to delete
     temp_node = curr->next;
     rm_val = temp_node->value;
 
@@ -144,7 +158,7 @@ int delete_by_index(Node **head, int index) {
 
     free(temp_node);
     temp_node = NULL;
-    
+
     return rm_val;
 }
 
@@ -184,42 +198,32 @@ void free_node(Node **head) {
 }
 
 int main(void) {
-    Node *list = NULL; 
+    Node *list = NULL;
 
-    push_node(&list, 24);
-    push_node(&list, 26);
-    unshift_node(&list, 28);
-    unshift_node(&list, 30);
-    push_node(&list, 32);
-    push_node(&list, 15);
-    print_ll(list);
+    push_node(&list, 3);
+    push_node(&list, 4);
+    push_node(&list, 5);
+    unshift_node(&list, 1);
+    push_node(&list, 6);
 
-    printf("shifted: %d\n",shift_node(&list));
-    print_ll(list);
-    
-    printf("popped: %d\n", pop_node(list));
-    print_ll(list);
+    print_ll(list); // [1]->[3]->[4]->[5]->[6]->NULL
 
-    int deleted;
-    if ((deleted = delete_by_value(&list, 24)) == -1) {
-        printf("does not exist\n");
-    } else {
-        printf("value: %d deleted\n", deleted); 
-    }
-    print_ll(list);
+    // printf("shift: %d\n", shift_node(&list)); // 1
+    // print_ll(list); // [3]->[4]->[5]->[6]->NULL
 
-    if ((deleted = delete_by_index(&list, 5)) == -1) {
-        printf("does not exist\n");
-    } else {
-        printf("value: %d deleted\n", deleted); 
-    }
+    // printf("pop: %d\n", pop_node(list)); // 6
+    // print_ll(list); // [3]->[4]->[5]->NULL
 
-    // reverse_ll(&list);
-    print_ll(list);
+    printf("delete by value: %d\n", delete_by_value(&list, 4)); // 4
+    print_ll(list); // [1]->[3]->[5]->[6]->NULL 
 
-    if (list != NULL) {
-        free_node(&list);
-    }
+    // printf("delete by index: %d\n", delete_by_index(&list, 3));  
+    // print_ll(list); // [3]->[5]->NULL
+
+    reverse_ll(&list);
+    print_ll(list); // [5]->[3]->NULL
+
+    free_node(&list);
 
     return 0;
 }
