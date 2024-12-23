@@ -28,7 +28,7 @@ typedef struct {
     Node **bucket;
 } HashTable;
 
-u32 hash_key(const char *key, u32 size)  {
+u32 create_key_hash(const char *key, u32 size)  {
     u32 hash = 5381;
     u32 c;
     while ((c = *key++)) {
@@ -39,16 +39,16 @@ u32 hash_key(const char *key, u32 size)  {
 }
 
 HashTable *create_table(u32 size) {
-    HashTable *table = (HashTable *)malloc(sizeof(HashTable));
-    table->size = size;
-    table->count = 0;
-    table->bucket = (Node **)malloc(sizeof(Node *) * size);
+    HashTable *new_table = (HashTable *)malloc(sizeof(HashTable));
+    new_table->size = size;
+    new_table->count = 0;
+    new_table->bucket = (Node **)malloc(sizeof(Node *) * size);
 
     for (u32 i = 0; i < size; i++) {
-        table->bucket[i] = NULL;
+        new_table->bucket[i] = NULL;
     }
 
-    return table;
+    return new_table;
 }
 
 void resize_table(HashTable *table) {
@@ -62,10 +62,12 @@ void resize_table(HashTable *table) {
     for (u32 i = 0; i < table->size; i++) {
         Node *curr = table->bucket[i];
         while (curr != NULL) {
-            u32 index = hash_key(curr->key, new_size);
+            u32 index = create_key_hash(curr->key, new_size);
+
             Node *next = curr->next;
             curr->next = new_bucket[index];
             new_bucket[index] = curr;
+
             curr = next;
         }
     }
@@ -76,39 +78,37 @@ void resize_table(HashTable *table) {
 }
 
 Node *create_node(u8 *key, u32 value) {
-    Node *node = (Node *)malloc(sizeof(Node));
-    node->key = key;
-    node->value = value;
-    node->next = NULL;
+    Node *new_node = (Node *)malloc(sizeof(Node));
+    new_node->key = key;
+    new_node->value = value;
+    new_node->next = NULL;
 
-    return node;
+    return new_node;
 }
 
-void insert(HashTable * table, u8 *key, u32 value) {
+void insert(HashTable *table, u8 *key, u32 value) {
     if ((table->count / table->size) > LOAD_FACTOR) {
         resize_table(table);
     }
 
-    u32 index = hash_key(key, table->size);
+    u32 index = create_key_hash(key, table->size);
     Node *curr = table->bucket[index];
     Node *new_node = create_node(key, value);
 
     if (curr == NULL) {
         table->bucket[index] = new_node;
-        table->count++;
-        return;
+    } else {
+        while (curr->next != NULL) {
+            curr = curr->next;
+        }
+        curr->next = new_node;
     }
 
-    while (curr->next != NULL) {
-        curr = curr->next;
-    }
-
-    curr->next = new_node;
     table->count++;
 }
 
 i32 find(HashTable *table, u8 *key) {
-    u32 index = hash_key(key, table->size);
+    u32 index = create_key_hash(key, table->size);
     Node *curr = table->bucket[index];
 
     while (curr != NULL) {
@@ -122,19 +122,20 @@ i32 find(HashTable *table, u8 *key) {
 }
 
 void delete_key(HashTable *table, u8 *key) {
-    u32 index = hash_key(key, table->size);
-    Node *curr = table->bucket[index];
-    Node *prev = NULL;
+    u32 index = create_key_hash(key, table->size);
+    Node *curr = table->bucket[index], 
+        *prev = NULL;
 
-    while (curr != NULL) {
+    while (curr != NULL) { 
         if (strcmp(curr->key, key) == 0) {
             if (prev == NULL) {
                 table->bucket[index] = curr->next;
             } else {
                 prev->next = curr->next;
             }
-
+            
             free(curr);
+            curr = NULL;
             table->count--;
             return;
         }
@@ -177,17 +178,15 @@ int main(void) {
     insert(table, "orange", 10);
     insert(table, "orangi", 30);
     insert(table, "apple", 20);
+    delete_key(table, "orange");
+
     insert(table, "banana", 21);
     insert(table, "grape", 40); 
     insert(table, "orango", 40);
+    print_table(table);
 
     printf("%d\n", find(table, "orange"));
     printf("%d\n", find(table, "watermelon"));
-
-    delete_key(table, "orange");
-    printf("%d\n", find(table, "orange"));
-
-    print_table(table);
 
     free_table(&table);
     return 0;
