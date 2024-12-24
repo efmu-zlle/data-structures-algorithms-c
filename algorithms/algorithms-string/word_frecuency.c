@@ -1,43 +1,65 @@
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <fcntl.h>
-// #include <unistd.h>
+#include <string.h>
+#include <ctype.h>
 
 #define MAX_WORD_LENGTH 50
-#define MAX_WORDS 100
+#define MAX_WORDS 1000
 
 typedef struct {
     char word[MAX_WORD_LENGTH];
     int frecuency;
 } WordFrecuency;
 
+char *to_lower_case(char *str) {
+    for (int i = 0; str[i]; i++) {
+        str[i] = tolower(str[i]);
+    }
+
+    return str;
+}
+
 int main(void) {
     FILE *file = fopen("words.txt", "r");
     if (file == NULL) {
         perror("fopen");
-        return 1;
+        exit(1);
     }
 
     char buffer[MAX_WORD_LENGTH];
     WordFrecuency list[MAX_WORDS];
-    int count = 0;
+    int word_count = 0;
     while (fscanf(file, "%s", buffer) != EOF) {
-        // loop through the list and search for the current value
+        to_lower_case(buffer);
         int found = 0;
 
-        strcpy(list[count].word, buffer);
-        list[count].frecuency++;
-        count++;
-    } // need logic here 
+        for (int i = 0; i < word_count; i++) {
+            if (strcmp(list[i].word, buffer) == 0) {
+                list[i].frecuency++;
+                found = 1;
+                break;
+            }
+        }
+
+        if (!found && word_count < MAX_WORDS) {
+            strcpy(list[word_count].word, buffer);
+            list[word_count].frecuency++;
+            word_count++;
+        }
+    } 
 
     fclose(file);
+
+    printf("word\t\tfrecuency\n");
+    printf("================\n");
+    for (int i = 0; i < word_count; i++) {
+        printf("%-20s%d\n", list[i].word, list[i].frecuency);
+    }
+
     return 0;
 }
 
-// Palabra         Frecuencia
+// word         Frecuencia
 // =======================   
 // the                 6
 // quick               3
