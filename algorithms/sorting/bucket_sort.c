@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -20,7 +21,7 @@ Node *create_node(int num) {
     return new_node;
 }
 
-void sorted_insert(Node **bucket, int num) {
+void sorted_insert(Node **bucket, int num) { 
     Node *new_node = create_node(num);
 
     if (*bucket == NULL || num < (*bucket)->number) {
@@ -57,16 +58,23 @@ void bucket_sort(int arr[], size_t length) {
     }
 }
 
+/*void print_array(int arr[], size_t length) {*/
+/*    for (int i = 0; i < length; i++) {*/
+/*        printf("%d ", arr[i]);*/
+/*    }*/
+/*    printf("\n");*/
+/*}*/
+
 void print_array(int arr[], size_t length) {
     for (int i = 0; i < length; i++) {
-        printf("%d ", arr[i]);
+        printf("%d", arr[i]);
     }
     printf("\n");
 }
 
 int main(void) {
     int array[] = { 6, 1, 2, 5, 4, 3, 7, 8 };
-    // int array[] = { 26, 21, 25, 22, 28, 24, 27, 23 };
+    // int array[] = { 26, 21, 25, 22, 28, 24, 27, 20 };
     size_t length = sizeof(array) / sizeof(array[0]);
 
     printf("before sorting:\n");
