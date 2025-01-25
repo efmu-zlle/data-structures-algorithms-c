@@ -61,9 +61,9 @@ int shift_node(Node **head) {
 
 int pop_node(Node *head) {
     int rm_val = -1;
-
+    
     if (head == NULL) {
-        printf("shift: no list found\n");
+        printf("pop: no list found\n");
         return rm_val;
     }
 
@@ -152,7 +152,7 @@ int delete_by_index(Node **head, int index) {
     rm_val = temp->value;
 
     curr->next = temp->next;
-    
+
     free(temp);
     temp = NULL;
 
@@ -177,7 +177,7 @@ void reverse_ll(Node **head) {
 
 // print the linked list
 void print_ll(Node *head) {
-    for (Node *curr = head; curr != NULL; curr = curr->next) {
+    for (Node *curr = head; curr != NULL; curr = curr->next) {  
         printf("[%d]->", curr->value);
     }
     printf("NULL\n");
@@ -221,6 +221,7 @@ int main(void) {
     // print_ll(list); // [5]->[3]->NULL
 
     free_node(&list);
+    list = NULL;
 
     return 0;
 }
